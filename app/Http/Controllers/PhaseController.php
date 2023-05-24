@@ -11,23 +11,46 @@ class PhaseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
+        $all_events = Phase::all();
+        $events = [];
+        foreach($all_events as $event){
+            $events[] = [
+                // 'title' => $event->event,
+                // 'start' => $event->start_date,
+                // 'end' => $event->end_date,
+                'title' => $event->name,
+                'start' => $event->initial_date,
+                'end' => $event->final_date,
+            ];
+        }
+
+        return view('projects.calendar', compact('events'));
+   
+    
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Project $project)
     {
-        //
+        return view('phase.create', compact('project'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request){//Store de la fase sin tarea, una vez creada te redirige a la página para ver los detalles de ese proyecto con la nueva fase
+        $request->validate([
+            'name' => ['required', 'string', 'min:5', 'max:255'],
+            'description' => ['required', 'string', 'min:5', 'max:255'],
+            'initial_date' => ['required', 'date'],
+            'final_date' => ['required', 'date',],
+        ]);
+        
         $phase = new Phase();
         $phase->name = $request->name;
         $phase->progress = 0;
